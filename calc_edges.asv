@@ -1,0 +1,35 @@
+%% エッジコスト計算
+%     引数：
+%         自己推定系列：xlist
+%         ランドマーク系列：zlist
+%     戻り値：
+%         エッジ構造体集合：edges
+function edges = calc_edges(xlist, zlist)
+edges = [];
+cost = 0.0;
+nt_z = size(zlist,2);  % 厳密には-1か？
+z_IDs = nchoosek([1:nt_z],2);    % データ番号の組み合わせ配列（時刻+1に対応）
+
+for j = 1:size(z_IDs,1)  % すべての組み合わせに対して
+    % データ番号抽出
+    t1 = z_IDs(j,1);    % 離散時刻+1 t1 
+    t2 = z_IDs(j,2);    % 離散時刻+1 t2
+    
+    zlist_temp1 = zlist{t1};
+    zlist_temp2 = zlist{t2};
+    
+    if zlist_temp1 == [] || zlist
+    % すべての観測したランドマーク情報に対して
+    for k = 1:size(zlist_temp1,1)
+        for l = 1:size(zlist_temp2,2)
+            % 同一のランドマーク情報を比較する
+            if zlist_temp1(k,4) == zlist_temp2(l,4)                
+                % エッジ生成&コスト追加（総和をとるから）
+                edge = make_edge(xlist(:, t1), xlist(:, t2), zlist{t1}(k,:), zlist{t2}(l,:), t1, t2);
+                cost = cost + edge.e'*edge.OMEGA*edge.e;    % 情報行列Ω（共分散のinv）で重み付け
+                edges = [edges, edge];                               
+            end
+        end
+    end
+end
+fprintf('cost:%f, nedge:%f \n',cost, length(edges))

@@ -1,0 +1,19 @@
+%% 1ステップ挙動計算（ロボット座標系）
+%     引数：
+%         状態：x = [x座標, y座標, yaw]'
+%         入力：u = [並進速度, 旋回速度]'
+%     戻り値：
+%         1ステップ先の状態：x_next = [x座標, y座標, yaw]'
+%     確率ロボティクスの速度制御モデル（γを除く）
+function x_next = calc_motion(x,u)
+% 無名関数で演算定義省略
+s = @(theta) sin(theta);
+c = @(theta) cos(theta);
+
+yaw = x(3);
+v = u(1);
+omega = u(2);
+
+dx = []
+
+x_next = x + 
